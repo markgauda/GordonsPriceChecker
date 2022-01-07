@@ -40,7 +40,8 @@ def main():
     while True:
         for item in item_list:
             #check the price of the current item
-            item.update_price_now()
+            logging.debug("Checking item with ID: "+ item.id)
+            item.update_item() #update price and quantity
             #is the price_now <= price_wanted?
             if(item.price_now <= item.price_wanted and item.price_now != 0.0):
                 #Notify the user
