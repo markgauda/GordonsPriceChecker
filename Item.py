@@ -16,11 +16,23 @@ class GordonsItem():
         self.gordons_url = "https://www.gordonrestaurantmarket.com/products/"
         self.price_now = None
 
+    def update_price_now(self):
+        """This method will update the price_now variable
+        If there is an error getting the new price then
+        the value of the current price will stay the same
+        """
+        logging.debug("Updating price on item with id: " + str(self.id))
+        price = self.check_price()
+        if (price == None):
+            return None
+        else:
+            self.price_now = float(price)
+
     def check_price(self):
         """
-        This method will check gordons website to get the price_now
+        This method will check gordons website to get the price of the item
         If there is an error, this will return None
-        If there is not an errror, this will return the current price
+        If there is not an error, this will return the current price
         of the item
         """
         #connect to the gordons site
@@ -35,8 +47,6 @@ class GordonsItem():
         return price
 
         
-        
-        
 
     def connect_to_URL(self):
         """
@@ -46,7 +56,7 @@ class GordonsItem():
         If the connection is unsuccessful, this will return None
         """
         #Make the Item URL
-        item_url = self.gordons_url + self.item_id + '/'
+        item_url = self.gordons_url + str(self.id) + '/'
         try:
             #Request data from the gordons website
             website_data = requests.get(item_url)
@@ -74,7 +84,8 @@ class GordonsItem():
         Args:
             website_request (String): The HTML to turn into a soup object
         """
-        return BeautifulSoup(website_request, "html.parser")
+        website_soup = BeautifulSoup(website_request.text, "html.parser")
+        return website_soup
 
 
     def look_for_price_on_page(self, website_soup):
@@ -88,7 +99,9 @@ class GordonsItem():
             The price of the item on that webpage
         """
         website_unit_price = website_soup.find_all("span", class_ = "unit_price", limit = 1)
-        return website_unit_price[0]
+        unit_price = website_unit_price[0].text #Get the numbers
+        unit_price = unit_price.strip(" $") #Get that formating out of there
+        return unit_price
     
         
         
