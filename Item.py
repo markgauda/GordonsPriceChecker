@@ -13,38 +13,29 @@ class GordonsItem():
     def __init__(self, item_id, price_wanted):
         self.id = item_id
         self.price_wanted = float(price_wanted)
-        self.gordons_url = "https://www.gordonrestaurantmarket.com/products/"
+        self.item_url = "https://www.gordonrestaurantmarket.com/products/" + str(item_id) + '/' 
         self.price_now = 0.0
+        self.quantity_in_stock = 0
 
-    def update_price_now(self):
-        """This method will update the price_now variable
-        If there is an error getting the new price then
-        the value of the current price will stay the same
-        """
-        logging.debug("Updating price on item with id: " + str(self.id))
-        price = self.check_price()
-        if (price == None):
-            return None
-        else:
+    def update_item(self):
+        website_soup = self.get_website_soup()
+        price = self.look_for_price_on_page(website_soup)
+        quantity = self.look_for_quantity_on_page(website_soup)
+        if (price != None):
             self.price_now = float(price)
+        if (quantity != None):
+            self.quantity_in_stock = int(quantity)
 
-    def check_price(self):
-        """
-        This method will check gordons website to get the price of the item
-        If there is an error, this will return None
-        If there is not an error, this will return the current price
-        of the item
-        """
+
+    def get_website_soup(self):
         #connect to the gordons site
         website_request = self.connect_to_URL()
         if(website_request == None):
             return None
         #make BS object
         website_soup = self.make_beautiful_soup_object(website_request)
-        #look for price on page
-        price = self.look_for_price_on_page(website_soup)
-        #return price
-        return price
+        #return soup
+        return website_soup
 
         
 
@@ -56,7 +47,7 @@ class GordonsItem():
         If the connection is unsuccessful, this will return None
         """
         #Make the Item URL
-        item_url = self.gordons_url + str(self.id) + '/'
+        item_url = self.item_url
         try:
             #Request data from the gordons website
             website_data = requests.get(item_url)
@@ -107,6 +98,23 @@ class GordonsItem():
         unit_price = unit_price.strip(" $") #Get that formating out of there
         return unit_price
     
-        
+    def look_for_quantity_on_page(self, website_soup):
+        """This function will look through the website soup and find the quantity of the product
+
+        Args:
+            website_soup (BeautifulSoup): This is the HTML that has been parsed and turned into a BS object
+
+        Returns:
+            Int: The quantity of the item
+            None: If there is an error and no quantity can be found
+        """
+        website_quantity = website_soup.find_all("span", class_ = "item_inventory_stock_level", limit = 1)
+        try:
+            quantity = website_quantity[0]. text
+
+        except:
+            logging.info("There was no quantity found on the page")
+            return None
+        return quantity
         
         
