@@ -6,12 +6,14 @@ if the prices of items are below a specified price, and if they are,
 the user will be notified
 """
 import logging
+from time import sleep
 import Item
 loggingFormat = "%(asctime)s ~ %(levelname)s ~ %(message)s"
 logging.basicConfig(level = logging.DEBUG, format = loggingFormat)
 
 def main():
     #Try to open the item file, if it dosen't exist, make it
+    logging.debug("Starting price tracker Main()")
     file_name = "item_objects.txt"
     try:
         logging.debug("Trying to open the item file")
@@ -35,14 +37,15 @@ def main():
     #Close the item file
     input_file.close()
     #loop through each item in the list
-    for item in item_list:
-        #check the price of the current item
-        item.update_price_now()
-        #is the price_now <= price_wanted?
-        if(item.price_now <= item.price_wanted):
-            #Notify the user
-            pass
-        #Should I break?
+    while True:
+        for item in item_list:
+            #check the price of the current item
+            item.update_price_now()
+            #is the price_now <= price_wanted?
+            if(item.price_now <= item.price_wanted and item.price_now != 0.0):
+                #Notify the user
+                pass
+        sleep(5)
 
     return None #Dummy return
 
@@ -51,20 +54,24 @@ def make_item_file(file_name):
     with open(file_name, 'w') as output_file:
         print("enter 'e' to exit")
         while True:
-            user_input = input("What is the ID you would like to track=> ")
-            if (user_input.lower() == 'e'):
+            item_id = input("What is the ID you would like to track=> ")
+            if (item_id.lower() == 'e'):
                 break
-            elif (not user_input.isnumeric):
+            elif (not item_id.isnumeric):
                 print("Please only enter a number or the letter 'e'")
-            elif (user_input.isnumeric):
-                print("Adding " + user_input + "to the tracker")
-                input("What is the price you would like to set the watch point at=> ")
-                if (user_input.lower() == 'e'):
+            elif (item_id.isnumeric):
+                price_wanted = input("What is the price you would like to set the watch point at=> ")
+                price_wanted = price_wanted.strip(" $")
+                if (price_wanted.lower() == 'e'):
                     break
-                elif (not user_input.isnumeric):
+                elif (not price_wanted.isnumeric):
                     print("Please only enter a number or the letter 'e'")
-                elif (user_input.isnumeric):
-                    print("Adding " + user_input + "to the tracker")
-                output_file.write(user_input + '\n')
+                elif (price_wanted.replace('.','').isnumeric): #strip the bad chars
+                    print("Adding " + item_id + " to the tracker")
+                    output_file.write(item_id+" ")
+                    print("Adding " + price_wanted + " to the tracker")
+                    output_file.write(price_wanted + '\n')
+
+
 
 main()
