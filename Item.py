@@ -14,7 +14,7 @@ class GordonsItem():
         self.id = item_id
         self.price_wanted = float(price_wanted)
         self.gordons_url = "https://www.gordonrestaurantmarket.com/products/"
-        self.price_now = None
+        self.price_now = 0.0
 
     def update_price_now(self):
         """This method will update the price_now variable
@@ -72,7 +72,7 @@ class GordonsItem():
             #check to make sure the URL gave good info
             website_data.raise_for_status()
         except:
-            log_message ="failed connect to URL with status code"+\
+            log_message ="failed connect to URL with status code "+\
                 str(website_data.status_code)
             logging.info(log_message)
             return None
@@ -96,10 +96,14 @@ class GordonsItem():
             beautiful soup object
         
         Return:
-            The price of the item on that webpage
+            The price of the item on that webpage or None if no price is found
         """
         website_unit_price = website_soup.find_all("span", class_ = "unit_price", limit = 1)
-        unit_price = website_unit_price[0].text #Get the numbers
+        try:
+            unit_price = website_unit_price[0].text #Get the numbers
+        except:
+            logging.info("There was no price found on this page")
+            return None
         unit_price = unit_price.strip(" $") #Get that formating out of there
         return unit_price
     
