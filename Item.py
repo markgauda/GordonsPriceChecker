@@ -1,6 +1,9 @@
 """
 This was created by Mark Gauda in the winter of 2022
 This is the class for a gordons Item
+
+Todo: consider generalizing the Item class so you can make
+    a tracker for multiple websites
 """
 import logging
 import requests
