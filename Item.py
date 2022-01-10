@@ -8,6 +8,7 @@ Todo: consider generalizing the Item class so you can make
 import logging
 import requests
 from bs4 import BeautifulSoup
+from EmailHandler import EmailHandler
 loggingFormat = "%(asctime)s ~ %(levelname)s ~ %(message)s"
 logging.basicConfig(level = logging.DEBUG, format = loggingFormat)
 
@@ -120,4 +121,19 @@ class GordonsItem():
             return None
         return quantity
         
+
+    def send_notification_email(self):
+        """This function will send an email notifictation for this item
+        """
+        price = str(self.price_now)
+        url = str(self.item_url)
+        quantity = str(self.quantity_in_stock)
+        item_id = str(self.id)
+        email_handler = EmailHandler()
+        email_message = "\nThe item with the ID: " + item_id +\
+            " is on sale right now for $" + price +\
+            " and there are " + quantity + " left in stock." +\
+            "\nTo buy this item, click " + "here: " + url
+        email_subject = "There is a sale on Gordons item " + item_id
+        email_handler.send_an_email(email_subject, email_message)
         
