@@ -120,9 +120,11 @@ class EmailHandler():
             subject = subject + "\n"
         if (not subject.startswith("Subject:")):
             subject = "Subject: " + subject
+        full_message_to_send = subject + message
         for recipient_email in self.contacts:
             try:
-                self.smtp_connection.sendmail(self.email_addr, recipient_email, (subject + message))
+                self.smtp_connection.sendmail(self.email_addr, recipient_email, (full_message_to_send))
+                logging.debug("Email sent!")
 
             except:
                 log_message = "Could not send an email to " + recipient_email
