@@ -7,6 +7,7 @@ the user will be notified
 """
 import logging
 from time import sleep
+from EmailHandler import EmailHandler
 import Item
 loggingFormat = "%(asctime)s ~ %(levelname)s ~ %(message)s"
 logging.basicConfig(level = logging.DEBUG, format = loggingFormat)
@@ -44,11 +45,11 @@ def main():
             item.update_item() #update price and quantity
             #is the price_now <= price_wanted?
             if(item.price_now <= item.price_wanted and item.price_now != 0.0):
-                #Notify the user
-                pass
+                item.send_notification_email()
         sleep(5)
 
     return None #Dummy return
+
 
 
 def make_item_file(file_name):
